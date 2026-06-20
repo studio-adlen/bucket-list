@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Two Chapters — Bucket List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --plum: #2D1B2E;
+    --plum-deep: #1A1014;
+    --rose: #C97B84;
+    --rose-soft: #E3AFAE;
+    --blush: #F4E8E1;
+    --gold: #C9A87C;
+    --paper: #FBF6F1;
+    --ink: #2A1F26;
+    --line: rgba(45,27,46,0.12);
+    --shadow: 0 20px 50px -20px rgba(26,16,20,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* ---------- Background atmosphere ---------- */
+  .atmosphere{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 800px 500px at 10% -10%, rgba(201,168,124,0.15), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 110% 10%, rgba(201,123,132,0.12), transparent 60%),
+      var(--paper);
+  }
+  .atmosphere::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(circle, rgba(45,27,46,0.045) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: 0.6;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding: 64px 24px 28px;
+    text-align: center;
+    position: relative;
+  }
+  .eyebrow{
+    font-family:'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(36px, 6vw, 64px);
+    margin: 0 0 10px;
+    color: var(--plum-deep);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+  .subtitle{
+    font-size: 15px;
+    color: #6b5b63;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ---------- Tabs / Chapter toggle ---------- */
+  .chapter-toggle{
+    display:flex;
+    justify-content:center;
+    gap: 0;
+    margin: 40px auto 8px;
+    max-width: 460px;
+    padding: 6px;
+    background: rgba(45,27,46,0.06);
+    border-radius: 999px;
+    position: relative;
+  }
+  .chapter-toggle button{
+    flex:1;
+    border: none;
+    background: transparent;
+    padding: 14px 18px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b5b63;
+    cursor: pointer;
+    border-radius: 999px;
+    position: relative;
+    z-index: 2;
+    transition: color 0.35s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .chapter-toggle button.active{ color: var(--paper); }
+  .chapter-toggle .slider{
+    position:absolute;
+    top:6px; bottom:6px;
+    left:6px;
+    width: calc(50% - 6px);
+    background: linear-gradient(135deg, var(--plum-deep), var(--plum));
+    border-radius: 999px;
+    transition: transform 0.45s cubic-bezier(.65,0,.35,1);
+    box-shadow: 0 8px 20px -6px rgba(45,27,46,0.5);
+    z-index: 1;
+  }
+  .chapter-toggle button[data-tab="after"].active ~ .slider,
+  .chapter-toggle.after .slider{ transform: translateX(100%); }
+
+  .tab-count{
+    font-family:'Inter',sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.65;
+  }
+
+  /* ---------- Progress strip ---------- */
+  .progress-wrap{
+    max-width: 720px;
+    margin: 30px auto 0;
+    padding: 0 24px;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size: 12px;
+    color:#8a7a82;
+    margin-bottom: 8px;
+    letter-spacing: 0.03em;
+  }
+  .progress-track{
+    height: 6px;
+    background: rgba(45,27,46,0.08);
+    border-radius: 999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(.65,0,.35,1);
+  }
+
+  /* ---------- Main list ---------- */
+  main{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+  }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation: fadeUp 0.5s ease both; }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .item-card{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px -6px rgba(26,16,20,0.08);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+  .item-card:hover{
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+    border-color: rgba(201,123,132,0.35);
+  }
+  .item-card.is-complete{
+    border-color: rgba(201,168,124,0.45);
+    background: linear-gradient(180deg, #fffdfb, #fff);
+  }
+
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    gap: 16px;
+    padding: 18px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .item-number{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--rose);
+    min-width: 26px;
+    padding-top: 3px;
+    opacity: 0.75;
+  }
+
+  .item-main{ flex: 1; min-width: 0; }
+
+  .item-text{
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--plum-deep);
+    line-height: 1.45;
+    margin: 0 0 9px;
+  }
+
+  .item-meta{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .status-pill{
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .status-locked{
+    background: rgba(45,27,46,0.06);
+    color: #8a7a82;
+  }
+  .status-progress{
+    background: rgba(201,123,132,0.14);
+    color: #A65560;
+  }
+  .status-complete{
+    background: linear-gradient(135deg, rgba(201,168,124,0.2), rgba(201,123,132,0.18));
+    color: #8C5A2E;
+  }
+
+  .stamp-stack{
+    display:flex;
+    align-items:center;
+  }
+  .stamp{
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    background: var(--blush);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 9px;
+    color: var(--gold);
+    margin-left: -7px;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  .stamp:first-child{ margin-left: 0; }
+
+  .chevron{
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(45,27,46,0.05);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink: 0;
+    transition: transform 0.35s ease, background 0.3s ease;
+    margin-top: 2px;
+  }
+  .item-card.expanded .chevron{ transform: rotate(180deg); background: rgba(201,123,132,0.15); }
+  .chevron svg{ width:13px; height:13px; stroke: var(--plum); }
+
+  /* ---------- History (collapsible) ---------- */
+  .history{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(.65,0,.35,1);
+  }
+  .item-card.expanded .history{ max-height: 400px; }
+
+  .history-inner{
+    padding: 0 20px 20px 56px;
+    border-top: 1px dashed var(--line);
+    margin-top: 2px;
+    padding-top: 14px;
+  }
+  .history-title{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a08e96;
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .history-list{
+    list-style: none;
+    margin: 0; padding: 0;
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-list li{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .history-dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background: var(--rose);
+    flex-shrink:0;
+  }
+  .history-empty{
+    font-size: 13px;
+    color: #a08e96;
+    font-style: italic;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align:center;
+    padding: 30px 20px 50px;
+    color: #a08e96;
+    font-size: 12.5px;
+    line-height:1.7;
+  }
+  footer .heart{ color: var(--rose); }
+
+  /* ---------- Scrollbar polish ---------- */
+  ::-webkit-scrollbar{ width: 10px; }
+  ::-webkit-scrollbar-thumb{ background: rgba(45,27,46,0.18); border-radius: 99px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 480px){
+    header{ padding: 48px 16px 20px; }
+    .item-row{ padding: 16px; gap: 12px; }
+    .history-inner{ padding-left: 16px; }
+    .chapter-toggle button{ font-size: 14px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="atmosphere"></div>
+
+<header>
+  <div class="eyebrow">A Living List, Two Chapters</div>
+  <h1>Our Two Chapters</h1>
+  <p class="subtitle">Every ride, every stamp, every quiet moment we promised each other — tracked here, one date at a time.</p>
+</header>
+
+<div class="chapter-toggle" id="chapterToggle">
+  <button data-tab="before" class="active">Before Marriage <span class="tab-count" id="beforeCount"></span></button>
+  <button data-tab="after">After Marriage <span class="tab-count" id="afterCount"></span></button>
+  <div class="slider"></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span id="progressLabel">0 of 18 items started</span>
+    <span id="progressPercent">0%</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<main>
+  <section class="panel active" id="panel-before"></section>
+  <section class="panel" id="panel-after"></section>
+</main>
+
+<footer>
+  <span class="heart">♥</span> Built to grow with you — update a date, and the whole page remembers it.
+</footer>
+
+<script>
+/* =========================================================
+   DATA — easily editable. Each item:
+   { id, text, count, dates: ["DD/MM/YYYY", ...] }
+   To log a new completion: find the item, count++, push date.
+   ========================================================= */
+const bucketData = {
+  before: [
+    { id: 1,  text: "Nyt ride + chaya with you.", count: 0, dates: [] },
+    { id: 2,  text: "Train yathra", count: 1, dates: ["8/6/2026"] },
+    { id: 3,  text: "Bus yathra", count: 0, dates: [] },
+    { id: 4,  text: "Parassini", count: 0, dates: [] },
+    { id: 5,  text: "Park", count: 0, dates: [] },
+    { id: 6,  text: "Hill Top (Kappu Mala / Ranipuram / Paithal Mala)", count: 0, dates: [] },
+    { id: 7,  text: "Eduth ponthikkanam (Sharukhan Chennai expressil edukkunna pole)", count: 0, dates: [] },
+    { id: 8,  text: "Mazhayath Ride (Without Raincoat)", count: 0, dates: [] },
+    { id: 9,  text: "Hug", count: 0, dates: [] },
+    { id: 10, text: "Beach", count: 0, dates: [] },
+    { id: 11, text: "Ambalam", count: 0, dates: [] },
+    { id: 12, text: "Njan vandi edukkumbo nee backil irikkanam", count: 0, dates: [] },
+    { id: 13, text: "Movie", count: 0, dates: [] },
+    { id: 14, text: "Food (Varitharanam)", count: 0, dates: [] },
+    { id: 15, text: "Sthalam fix aakkand vandi eduthitt povanam", count: 0, dates: [] },
+    { id: 16, text: "Kambi + Kiss", count: 0, dates: [] },
+    { id: 17, text: "Normal Bike Ride", count: 0, dates: [] },
+    { id: 18, text: "Orumich Evening chaya.", count: 0, dates: [] }
+  ],
+  after: [
+    { id: 1,  text: "Swanthamayi oru veed.", count: 0, dates: [] },
+    { id: 2,  text: "Long trip (Nalla thanupp ulla sthalam)", count: 0, dates: [] },
+    { id: 3,  text: "Kutti 1, 2 yrs kazhinj mathi.", count: 0, dates: [] },
+    { id: 4,  text: "Nee cook cheytha tharanam.", count: 0, dates: [] },
+    { id: 5,  text: "First nyt orikkalum marakkan pattatha oru day avanam.", count: 0, dates: [] },
+    { id: 6,  text: "Kallyanathinu nettiyil umma tharanam.", count: 0, dates: [] },
+    { id: 7,  text: "Daily 1 mint kiss, kettippidich orangnm.", count: 0, dates: [] },
+    { id: 8,  text: "Orumich kulikknm.", count: 0, dates: [] },
+    { id: 9,  text: "Milk factory.", count: 0, dates: [] },
+    { id: 10, text: "Daily nadakkunna karyangal share cheyyam time kandethanam.", count: 0, dates: [] },
+    { id: 11, text: "Pose Unlock.", count: 0, dates: [] },
+    { id: 12, text: "Bikil oru trip.", count: 0, dates: [] },
+    { id: 13, text: "Varanasi - Bang.", count: 0, dates: [] },
+    { id: 14, text: "Mashroom.", count: 0, dates: [] },
+    { id: 15, text: "First nyt kappu pottikkanm (First and last)", count: 0, dates: [] },
+    { id: 16, text: "Puthiya food um place um explore cheynm.", count: 0, dates: [] },
+    { id: 17, text: "Nyt Drive.", count: 0, dates: [] },
+    { id: 18, text: "Prds nu nalla care.", count: 0, dates: [] },
+    { id: 19, text: "Kali (Randalkkum thonnumbo ellam)", count: 0, dates: [] },
+    { id: 20, text: "15/6/2026 nu nyt paranja oro karyangalum oro day practical aakkanm.", count: 0, dates: [] }
+  ]
+};
+
+/* ========================= RENDER ========================= */
+
+function statusInfo(count){
+  if(count === 0) return { label: "Locked", cls: "status-locked", icon: "🔒" };
+  if(count === 1) return { label: "In Progress", cls: "status-progress", icon: "✦" };
+  return { label: `Completed ${count} Times`, cls: "status-complete", icon: "✓" };
+}
+
+function renderPanel(phaseKey, containerId){
+  const items = bucketData[phaseKey];
+  const container = document.getElementById(containerId);
+  container.innerHTML = items.map((item, idx) => {
+    const st = statusInfo(item.count);
+    const stamps = Array.from({length: Math.min(item.count, 6)})
+      .map(() => `<div class="stamp">✓</div>`).join("");
+    const extra = item.count > 6 ? `<div class="stamp" style="font-size:8px;">+${item.count-6}</div>` : "";
+
+    const historyItems = item.dates.length
+      ? item.dates.map(d => `<li><span class="history-dot"></span>${d}</li>`).join("")
+      : `<li class="history-empty">No dates logged yet.</li>`;
+
+    return `
+      <div class="item-card ${item.count > 0 ? 'is-complete' : ''}" data-phase="${phaseKey}" data-id="${item.id}">
+        <div class="item-row" onclick="toggleCard(this)">
+          <div class="item-number">${String(idx+1).padStart(2,'0')}</div>
+          <div class="item-main">
+            <p class="item-text">${item.text}</p>
+            <div class="item-meta">
+              <span class="status-pill ${st.cls}">${st.icon} ${st.label}</span>
+              ${item.count > 0 ? `<div class="stamp-stack">${stamps}${extra}</div>` : ""}
+            </div>
+          </div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+        </div>
+        <div class="history">
+          <div class="history-inner">
+            <p class="history-title">Completion History</p>
+            <ul class="history-list">${historyItems}</ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function toggleCard(rowEl){
+  const card = rowEl.closest(".item-card");
+  card.classList.toggle("expanded");
+}
+
+function updateProgress(){
+  const items = bucketData[currentTab];
+  const total = items.length;
+  const started = items.filter(i => i.count > 0).length;
+  const pct = total ? Math.round((started/total)*100) : 0;
+  document.getElementById("progressLabel").textContent = `${started} of ${total} items started`;
+  document.getElementById("progressPercent").textContent = `${pct}%`;
+  document.getElementById("progressFill").style.width = pct + "%";
+}
+
+function updateTabCounts(){
+  const bDone = bucketData.before.filter(i=>i.count>0).length;
+  const aDone = bucketData.after.filter(i=>i.count>0).length;
+  document.getElementById("beforeCount").textContent = `(${bDone}/${bucketData.before.length})`;
+  document.getElementById("afterCount").textContent = `(${aDone}/${bucketData.after.length})`;
+}
+
+/* ========================= TABS ========================= */
+let currentTab = "before";
+const toggleEl = document.getElementById("chapterToggle");
+
+document.querySelectorAll(".chapter-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".chapter-toggle button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTab = btn.dataset.tab;
+    toggleEl.classList.toggle("after", currentTab === "after");
+
+    document.getElementById("panel-before").classList.toggle("active", currentTab === "before");
+    document.getElementById("panel-after").classList.toggle("active", currentTab === "after");
+    updateProgress();
+  });
+});
+
+/* ========================= INIT ========================= */
+function renderAll(){
+  renderPanel("before", "panel-before");
+  renderPanel("after", "panel-after");
+  updateProgress();
+  updateTabCounts();
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
